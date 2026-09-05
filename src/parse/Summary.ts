@@ -22,7 +22,11 @@ export default class Summary {
       const parentId = toc['parent_uuid']
       const findRes = this.findTree(summary, parentId)
       const dirNameReg = /[\\/:*?"<>|\n\r]/g
-      const tocText = toc.title.replace(dirNameReg, '_').replace(/\s/, '')
+      const tocText = toc.title
+        .replace(dirNameReg, '_')
+        .replace(/\s/, '')
+        .replace(/\(/g, '（')
+        .replace(/\)/g, '）')
       const item: SummaryItem = {
         text: tocText,
         id: toc.uuid,
@@ -85,13 +89,13 @@ export default class Summary {
       if (item.type === ARTICLE_TOC_TYPE.TITLE) {
         // 是标题同时也是文档的情况
         if (item.link) {
-          const link = item.link ? item.link.replace(/\s/g, '%20') : item.link
+          const link = this.formatLink(item.link)
           summaryContent += `\n${''.padStart(item.level + 1, '#')} [${item.text}](${link})\n\n`
         } else {
           summaryContent += `\n${''.padStart(item.level + 1, '#')} ${item.text}\n\n`
         }
       } else if (item.type === ARTICLE_TOC_TYPE.LINK) {
-        const link = item.link ? item.link.replace(/\s/g, '%20') : item.link
+        const link = this.formatLink(item.link)
         summaryContent += `${item.level === 1 ? '\n##' : '-'} [${item.text}](${link})\n`
       }
       if (Array.isArray(item.children)) {
@@ -99,6 +103,14 @@ export default class Summary {
       }
     }
     return summaryContent
+  }
+
+  formatLink(rawLink?: string): string {
+    if (!rawLink) return ''
+    return rawLink
+      .replace(/\s/g, '%20')
+      .replace(/\(/g, '（')
+      .replace(/\)/g, '）')
   }
 
   findIdItem(node: SummaryItem, id: string) {
