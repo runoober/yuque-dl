@@ -82,7 +82,13 @@ export function fixMarkdownImage(imgList: string[], mdData: string, htmlData: st
 export function fixPath(dirPath: string) {
   if (!dirPath) return ''
   const dirNameReg = /[\\/:*?"<>|\n\r]/g
-  return removeEmojis(dirPath.replace(dirNameReg, '_').replace(/\s/g, ''))
+  return removeEmojis(
+    dirPath
+      .replace(dirNameReg, '_')
+      .replace(/\s/g, '')
+      .replace(/\(/g, '（')
+      .replace(/\)/g, '）')
+  )
 }
 
 
